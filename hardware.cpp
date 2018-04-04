@@ -17,7 +17,7 @@ DigitalIn button1(p21);                 // Pushbuttons (pin)
 DigitalIn button2(p22);
 DigitalIn button3(p23);
 AnalogOut DACout(p18);                  // Speaker (pin)
-PwmOut speaker(p25);
+PwmOut speaker(p26);
 wave_player waver(&DACout);
 
 // Some hardware also needs to have functions called before it will set up
