@@ -6,8 +6,8 @@
  * If additional hardware is added, new elements should be added to this struct.
  */
 struct GameInputs {
-    int b1, b2, b3;     // Button presses
-    double ax, ay, az;  // Accelerometer readings
+    int b1, b2, b3, b4;     // Buttons
+    double ax, ay, az;      // Accelerometer readings
 };
 
 /**

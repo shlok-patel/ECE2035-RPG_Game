@@ -4,6 +4,22 @@
 //=============================================
 #ifndef GLOBAL_H
 #define GLOBAL_H
+#define HEIGHT1 50
+#define WIDTH1  50
+#define HEIGHT2 24
+#define WIDTH2  25
+#define NUMBUCKETS 7
+
+// all colors I added
+#define BACKGROUND      0x14491f
+#define YELLOW          0xFFFF00
+#define BROWN           0xD2691E
+#define TEXTGREEN       0x0C8607
+#define DUNGEONFLOOR    0x14491f
+#define DIRT            BROWN
+#define GOLD            0xFFD700
+#define SILVER          0xC0C0C0
+#define VIOLET          0x8A2BE2
 
 // Include all the hardware libraries
 #include "mbed.h"

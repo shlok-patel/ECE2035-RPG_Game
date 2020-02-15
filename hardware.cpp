@@ -16,6 +16,7 @@ MMA8452 acc(p28, p27, 100000);        // Accelerometer (sda, sdc, rate)
 DigitalIn button1(p21);                 // Pushbuttons (pin)
 DigitalIn button2(p22);
 DigitalIn button3(p23);
+DigitalIn button4(p24);
 AnalogOut DACout(p18);                  // Speaker (pin)
 PwmOut speaker(p26);
 wave_player waver(&DACout);
@@ -32,6 +33,7 @@ int hardware_init()
     button1.mode(PullUp); 
     button2.mode(PullUp);
     button3.mode(PullUp);
+    button4.mode(PullUp);
     
     return ERROR_NONE;
 }
@@ -39,5 +41,14 @@ int hardware_init()
 GameInputs read_inputs() 
 {
     GameInputs in;
+    
+    in.b4 = button4; // top button
+    in.b3 = button1; // 2nd button  
+    in.b2 = button2; // 3rd button
+    in.b1 = button3; // bottom button  
+    
+    acc.readXGravity(&in.ax);
+    acc.readYGravity(&in.ay);
+    acc.readZGravity(&in.az);
     return in;
 }

@@ -1,6 +1,6 @@
 /*
- Student Name:
- Date:
+ Student Name: Shlok Patel
+ Date:         11/25/2018
 
 =======================
 ECE 2035 Project 2-1:
@@ -78,15 +78,15 @@ Naming conventions in this file:
  * Use "HashTable" instead when you are creating a new variable. [See top comments]
  */
 struct _HashTable {
-  /** The array of pointers to the head of a singly linked list, whose nodes
-      are HashTableEntry objects */
-  HashTableEntry** buckets;
+    /** The array of pointers to the head of a singly linked list, whose nodes
+        are HashTableEntry objects */
+    HashTableEntry** buckets;
 
-  /** The hash function pointer */
-  HashFunction hash;
+    /** The hash function pointer */
+    HashFunction hash;
 
-  /** The number of buckets in the hash table */
-  unsigned int num_buckets;
+    /** The number of buckets in the hash table */
+    unsigned int num_buckets;
 };
 
 /**
@@ -94,17 +94,17 @@ struct _HashTable {
  * Use "HashTableEntry" instead when you are creating a new variable. [See top comments]
  */
 struct _HashTableEntry {
-  /** The key for the hash table entry */
-  unsigned int key;
+    /** The key for the hash table entry */
+    unsigned int key;
 
-  /** The value associated with this hash table entry */
-  void* value;
+    /** The value associated with this hash table entry */
+    void* value;
 
-  /**
-  * A pointer pointing to the next hash table entry
-  * NULL means there is no next entry (i.e. this is the tail)
-  */
-  HashTableEntry* next;
+    /**
+    * A pointer pointing to the next hash table entry
+    * NULL means there is no next entry (i.e. this is the tail)
+    */
+    HashTableEntry* next;
 };
 
 
@@ -125,8 +125,13 @@ struct _HashTableEntry {
 * @param value The value stored in the hash table entry
 * @return The pointer to the hash table entry
 */
-static HashTableEntry* createHashTableEntry(unsigned int key, void* value) {
-
+static HashTableEntry* createHashTableEntry(unsigned int key, void* value)
+{
+    HashTableEntry* HTentry = (HashTableEntry*)malloc(sizeof(HashTableEntry));
+    HTentry->key = key;                                                   // key
+    HTentry->value = value;                                               // value tied to key
+    HTentry->next = NULL;                                                 // next entry is defined null
+    return HTentry;
 }
 
 /**
@@ -139,9 +144,20 @@ static HashTableEntry* createHashTableEntry(unsigned int key, void* value) {
 * @param key The key corresponds to the hash table entry
 * @return The pointer to the hash table entry, or NULL if key does not exist
 */
-static HashTableEntry* findItem(HashTable* hashTable, unsigned int key) {
-
+static HashTableEntry* findItem(HashTable* hashTable, unsigned int key)
+{
+    unsigned int i = hashTable->hash(key);                                // i = bucket index
+    HashTableEntry* thisNode = hashTable->buckets[i];                     // thisNode points to item
+    while(thisNode) {                                                     // while thisNode is not null
+        if(thisNode->key == key) {                                        // if thisNode lookdown key equals key
+            return thisNode;                                              // return thisNode
+        }
+        thisNode = thisNode->next;                                        // else go to next entry
+    }
+    return thisNode;
 }
+
+
 
 /****************************************************************************
 * Public Interface Functions
@@ -151,48 +167,105 @@ static HashTableEntry* findItem(HashTable* hashTable, unsigned int key) {
 * above sections.
 ****************************************************************************/
 // The createHashTable is provided for you as a starting point.
-HashTable* createHashTable(HashFunction hashFunction, unsigned int numBuckets) {
-  // The hash table has to contain at least one bucket. Exit gracefully if
-  // this condition is not met.
-  if (numBuckets==0) {
-    printf("Hash table has to contain at least 1 bucket...\n");
-    exit(1);
-  }
+HashTable* createHashTable(HashFunction hashFunction, unsigned int numBuckets)
+{
+    // The hash table has to contain at least one bucket. Exit gracefully if
+    // this condition is not met.
+    if (numBuckets==0) {
+        printf("Hash table has to contain at least 1 bucket...\n");
+        exit(1);
+    }
 
-  // Allocate memory for the new HashTable struct on heap.
-  HashTable* newTable = (HashTable*)malloc(sizeof(HashTable));
+    // Allocate memory for the new HashTable struct on heap.
+    HashTable* newTable = (HashTable*)malloc(sizeof(HashTable));
 
-  // Initialize the components of the new HashTable struct.
-  newTable->hash = hashFunction;
-  newTable->num_buckets = numBuckets;
-  newTable->buckets = (HashTableEntry**)malloc(numBuckets*sizeof(HashTableEntry*));
+    // Initialize the components of the new HashTable struct.
+    newTable->hash = hashFunction;
+    newTable->num_buckets = numBuckets;
+    newTable->buckets = (HashTableEntry**)malloc(numBuckets*sizeof(HashTableEntry*));
 
-  // As the new buckets are empty, init each bucket as NULL.
-  unsigned int i;
-  for (i=0; i<numBuckets; ++i) {
-    newTable->buckets[i] = NULL;
-  }
+    // As the new buckets contain indeterminant values, init each bucket as NULL.
+    unsigned int i;
+    for (i=0; i<numBuckets; ++i) {
+        newTable->buckets[i] = NULL;
+    }
 
-  // Return the new HashTable struct.
-  return newTable;
+    // Return the new HashTable struct.
+    return newTable;
 }
 
-void destroyHashTable(HashTable* hashTable) {
-
+void destroyHashTable(HashTable* hashTable)
+{
+    HashTableEntry* Temp;
+    HashTableEntry* Temp2;
+    for(int i = 0; i < (hashTable->num_buckets); i++) {                   // parse through and free all items
+        Temp = hashTable->buckets[i];
+        Temp2 = Temp;
+        while(Temp) {                                                     // free item and its value
+            Temp2 = Temp;
+            Temp = Temp->next;
+            if(Temp2->value) {
+                free(Temp2->value);
+            }
+            free(Temp2);
+        }
+    }
+    free(hashTable->buckets);                                             // free buckets
+    free(hashTable);                                                      // free table
 }
 
-void* insertItem(HashTable* hashTable, unsigned int key, void* value) {
-
+void* insertItem(HashTable* hashTable, unsigned int key, void* value)
+{
+    unsigned int i = hashTable->hash(key);
+    HashTableEntry* thisItem = findItem(hashTable, key);                  // find item given key
+    if(thisItem) {                                                        // case 1 - if item already exists, replace existing value
+        void* prevValue;
+        prevValue = thisItem->value;
+        thisItem->value = value;                                          // overwrite previous value
+        return prevValue;                                                 // return previous value
+    }
+    HashTableEntry* newItem = createHashTableEntry(key, value);
+    if(!newItem) return NULL;                                             // case 2 - else if item doesn't exist, create new Hash Table entry
+    newItem->next = hashTable->buckets[i];
+    hashTable->buckets[i] = newItem;
+    return NULL;
 }
 
-void* getItem(HashTable* hashTable, unsigned int key) {
-
+void* getItem(HashTable* hashTable, unsigned int key)
+{
+    HashTableEntry* thisItem = findItem(hashTable,key);                   // find item
+    if(thisItem) return thisItem->value;                                  // if item exists, return it
+    return NULL;                                                          // else return NULL
 }
 
-void* removeItem(HashTable* hashTable, unsigned int key) {
-
+void* removeItem(HashTable* hashTable, unsigned int key)
+{
+    unsigned int i = hashTable->hash(key);                                // bucket index
+    HashTableEntry* thisNode = hashTable->buckets[i];
+    if(!thisNode) return NULL;                                            // if item is null return null
+    HashTableEntry* nextNode;
+    void* itemValue;
+    if(thisNode->key == key) {                                            // if current item is item you are looking for
+        itemValue = thisNode->value;                                      // store value
+        hashTable->buckets[i] =  thisNode->next;                          // stitch next item
+        free(thisNode);                                                   // free old item
+        return itemValue;                                                 // return stored value
+    }
+    while(thisNode->next) {                                               // keep going to next item
+        if(thisNode->next->key == key) {                                  // look for item whose key matches desired key
+            nextNode = thisNode->next;                                    // store item
+            itemValue = nextNode->value;                                  // store value
+            thisNode->next = thisNode->next->next;                        // stitch next next item as next item
+            free(nextNode);                                               // free next item
+            return itemValue;                                             // return stored value
+        }
+        thisNode = thisNode->next;                                        // go to next node and repeat while loop
+    }
+    return NULL;                                                          // return NULL if key not found
 }
 
-void deleteItem(HashTable* hashTable, unsigned int key) {
-
+void deleteItem(HashTable* hashTable, unsigned int key)
+{
+    void* item = removeItem(hashTable,key);                               // call removeItem to free item
+    free(item);                                                           // also free items value
 }

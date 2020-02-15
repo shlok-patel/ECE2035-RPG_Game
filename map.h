@@ -43,7 +43,7 @@ typedef struct {
      * a WALL probably doesn't need to use this (it can be NULL), where an NPC
      * might use it to store game state (have I given the player the key yet?).
      */
-    void* data;
+    int data;
 } MapItem;
 
 typedef struct {
@@ -53,9 +53,21 @@ typedef struct {
 
 // MapItem types
 // Define more of these!
-#define WALL    0
-#define PLANT   1
-
+#define TREE    0
+#define DUNGEONBRICK 1
+#define PLANT   2
+#define RIVER   3
+//#define BRIDGE  4
+#define PORTAL  5
+#define NPC     6
+#define SLIME   7
+#define GHOST   8
+#define GATE1   9
+#define GATE2   10
+#define FLAG    11
+#define KEY     12
+#define ROCK    13
+#define HEART   14
 /**
  * Initializes the internal structures for all maps. This does not populate
  * the map with items, but allocates space for them, initializes the hash tables, 
@@ -143,12 +155,31 @@ void map_erase(int x, int y);
  * If there are already items in the map that collide with this line, they are
  * erased.
  */
-void add_wall(int x, int y, int dir, int len);
+void add_wall1(int x, int y, int dir, int len);
 
 /**
  * Add a PLANT item at (x,y). If there is already a MapItem at (x,y), erase it
  * before adding the plant.
  */
 void add_plant(int x, int y);
+
+// MY ADDED ITEMS
+// NON WALKABLE
+void add_wall2(int x, int y, int dir, int len);
+void add_river(int x, int y, int dir, int len);
+void add_gate1(int x, int y);
+void add_gate2(int x, int y);
+void add_portal(int x, int y);
+void add_key(int x, int y);
+void add_rock(int x, int y);
+void add_heart(int x, int y);
+
+// WALKABLE
+void add_flag(int x, int y);
+
+// CHARACTERS
+void add_NPC(int x, int y);
+void add_slime(int x, int y);
+void add_ghost(int x, int y);
 
 #endif //MAP_H
